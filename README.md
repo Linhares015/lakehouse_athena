@@ -1,39 +1,75 @@
 # lakehouse_athena
 
-Este projeto demonstra um ambiente de Lakehouse on-premises utilizando Docker Compose com os seguintes componentes:
+Este repositório provê um exemplo simples de ambiente **Lakehouse** rodando localmente via Docker Compose. Ele inclui os principais serviços necessários para experimentar um fluxo analítico completo:
 
-- **MinIO** como storage compatível com S3
-- **Hive Metastore** com banco PostgreSQL
-- **Spark** com suporte a Delta Lake (master e worker)
-- **Trino** configurado para acessar o Hive Metastore e o MinIO
-- **Prometheus** e **Grafana** para observabilidade do ambiente
+- **MinIO** atuando como storage compatível com S3
+- **PostgreSQL** usado pelo **Hive Metastore**
+- **Spark** (master e worker) com suporte ao **Delta Lake**
+- **Trino** para consulta aos dados
+- **Prometheus**, **Grafana** e **Node Exporter** para observação
+
+## Requisitos
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/)
 
 ## Estrutura de diretórios
 
-- `minio/data` – volume persistente do MinIO
-- `postgres/data` – volume do PostgreSQL usado pelo Hive Metastore
-- `spark/conf` – configurações do Spark (ex.: `spark-defaults.conf`)
-- `trino/catalog` – catálogos do Trino
-- `scripts` – utilitários para iniciar ou parar o ambiente
+- `minio/data` – armazenamento persistente do MinIO
+- `postgres/data` – dados do PostgreSQL utilizado pelo Hive Metastore
+- `spark/conf` – arquivos de configuração do Spark (ex.: `spark-defaults.conf`)
+- `trino/catalog` – catálogos utilizados pelo Trino
 - `monitoring/prometheus.yml` – configuração do Prometheus
+- `scripts` – utilitários para iniciar ou parar o ambiente
 
-## Uso
+## Inicialização rápida
 
-Para iniciar todos os serviços em segundo plano utilize o script:
+Clone este repositório e execute:
 
 ```bash
 ./scripts/start.sh
 ```
 
-A interface do MinIO estará disponível em `http://localhost:9001` (usuário `minio` / senha `minio123`).
-O Spark Master estará em `http://localhost:8080` e o Trino em `http://localhost:8088`.
-O Prometheus pode ser acessado em `http://localhost:9090` e o Grafana em `http://localhost:3000`.
+Os contêineres serão criados em segundo plano. Para encerrá-los use `./scripts/stop.sh`.
 
-Cada serviço possui limites e reservas de CPU e memória definidos no `docker-compose.yml`.
-Esses valores podem ser ajustados conforme a capacidade do seu ambiente.
+## Acessando os serviços
 
-Quando quiser interromper e remover os serviços execute:
+- MinIO: <http://localhost:9001> (usuário **minio** / senha **minio123**)
+- Spark Master: <http://localhost:8080>
+- Trino: <http://localhost:8088>
+- Prometheus: <http://localhost:9090>
+- Grafana: <http://localhost:3000>
+
+## Exemplos de uso
+
+Listar catálogos disponíveis no Trino:
 
 ```bash
-./scripts/stop.sh
+docker-compose exec trino trino --execute 'SHOW CATALOGS;'
 ```
+
+Executar um comando simples no Spark:
+
+```bash
+docker-compose exec spark-master spark-sql -e "SHOW DATABASES;"
+```
+
+## Diagrama simplificado da infraestrutura
+
+```mermaid
+flowchart LR
+    subgraph Monitoring
+        NodeExporter --> Prometheus
+        Prometheus --> Grafana
+    end
+    SparkMaster --> HiveMetastore
+    SparkWorker --> SparkMaster
+    Trino --> HiveMetastore
+    HiveMetastore --> Postgres
+    MinIO --> HiveMetastore
+    MinIO --> SparkMaster
+    MinIO --> SparkWorker
+    MinIO --> Trino
+```
+
+Com esse ambiente é possível testar pipelines com Spark/Delta Lake e realizar consultas usando Trino, além de monitorar a saúde de cada serviço via Grafana.
