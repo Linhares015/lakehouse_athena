@@ -43,7 +43,7 @@ services:
           memory: 512M
 
   hive-metastore:
-    image: bitnami/hive-metastore:latest
+    image: trinodb/testing-hive-metastore:latest
     ports:
       - "9083:9083"
     environment:
