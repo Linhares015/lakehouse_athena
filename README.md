@@ -4,7 +4,7 @@ Este repositório provê um exemplo simples de ambiente **Lakehouse** rodando lo
 
 - **MinIO** atuando como storage compatível com S3
 - **PostgreSQL** usado pelo **Hive Metastore**
-- **Hive Metastore** fornecido pela imagem `trinodb/testing-hive-metastore`
+- **Hive Metastore** fornecido pela imagem `bitnami/hive-metastore`
 - **Spark** (master e worker) com suporte ao **Delta Lake**
 - **Trino** para consulta aos dados
 - **Prometheus**, **Grafana** e **Node Exporter** para observação
