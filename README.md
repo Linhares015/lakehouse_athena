@@ -22,6 +22,8 @@ Este repositório provê um exemplo simples de ambiente **Lakehouse** rodando lo
 - `trino/catalog` – catálogos utilizados pelo Trino
 - `monitoring/prometheus.yml` – configuração do Prometheus
 - `scripts` – utilitários para iniciar ou parar o ambiente
+- `jobs` – exemplos de ingestão de dados para PostgreSQL e SQL Server
+- `drivers` – drivers JDBC adicionais para integração com bancos externos
 
 ## Inicialização rápida
 
@@ -73,52 +75,35 @@ flowchart LR
     MinIO --> Trino
 ```
 
+
 Com esse ambiente é possível testar pipelines com Spark/Delta Lake e realizar consultas usando Trino, além de monitorar a saúde de cada serviço via Grafana.
 
+## Jobs de ingestão
+
+No diretório `jobs` estão scripts de exemplo para ler dados de PostgreSQL e SQL Server via Spark e gravar em Delta Lake no MinIO.
 
 
-rodar notebooks pyspark no vscode:
 
-💡 Por que você está travando nisso?
-✅ O VSCode Notebooks (Jupyter) precisa de um kernel com ipykernel instalado.
-✅ O kernel precisa saber onde está o Spark real (seja via PySpark, seja via findspark).
-✅ Você criou venv para rodar o kernel com Jupyter, mas o Spark REAL não vem do pip install pyspark.
-✅ Quando tenta usar o Python global, o VSCode reclama porque não tem ipykernel no global e você não consegue instalar (externally-managed environment, PEP 668).
+## Rodar notebooks PySpark no VSCode
 
-⚠ Resumo: o VSCode/Jupyter quer ipykernel → você só consegue em venv → mas seu Spark está fora do venv.
+Para utilizar o VSCode Notebooks com o Spark desta pasta, crie um ambiente virtual apenas com
+`ipykernel` e `findspark`.
 
-🚀 Solução limpa e que vai funcionar no seu cenário
-➡ Mantenha o Spark fora do venv, como você baixou (binário)
-➡ Use um venv para o Jupyter/ipykernel e findspark (não instale pyspark no venv)
-➡ Configure o findspark apontando para o Spark binário na primeira célula do notebook
-
-📝 Passo a passo final
-1️⃣ Crie o venv e instale o Jupyter + findspark:
-
-bash
-Copiar
-Editar
+```bash
 python3 -m venv venv_spark
 source venv_spark/bin/activate
 pip install ipykernel jupyterlab findspark
-(✨ não instale pyspark no venv!)
-
-2️⃣ Adicione o kernel:
-
-bash
-Copiar
-Editar
 python -m ipykernel install --user --name=venv_spark --display-name "Spark (venv)"
-3️⃣ No seu notebook, a primeira célula:
+```
 
-python
-Copiar
-Editar
+Em seguida, no início do seu notebook execute:
+
+```python
 import findspark
 findspark.init("/home/linhares/lakehouse_athena/spark")
-
 from pyspark.sql import SparkSession
-spark = SparkSession.builder.appName("Test").getOrCreate()
 
+spark = SparkSession.builder.appName("Test").getOrCreate()
 print("Spark Version:", spark.version)
 spark.range(5).show()
+```
