@@ -1,9 +1,9 @@
-./minio/data
+minio/data/**
 # Ignore MinIO data directory
 # This directory contains the data stored in MinIO, which is used for object storage.
 # It is important to keep this directory in the .gitignore file to avoid committing large binary files to the repository.
 
-./postgres/data
+postgres/data/**
 # Ignore PostgreSQL data directory
 # This directory contains the data stored in PostgreSQL, which is used for relational database storage.
 # It is important to keep this directory in the .gitignore file to avoid committing large binary files to the repository.
