@@ -1,19 +1,13 @@
-minio/data/**
-# Ignore MinIO data directory
-# This directory contains the data stored in MinIO, which is used for object storage.
-# It is important to keep this directory in the .gitignore file to avoid committing large binary files to the repository.
 
-postgres/data/**
-# Ignore PostgreSQL data directory
-# This directory contains the data stored in PostgreSQL, which is used for relational database storage.
-# It is important to keep this directory in the .gitignore file to avoid committing large binary files to the repository.
+# env files
+*.env
 
-venv_spark/**
-# Ignore virtual environment for Spark
-# This directory contains the virtual environment for Spark, which is used to manage Python dependencies.
-# It is important to keep this directory in the .gitignore file to avoid committing unnecessary files to the repository.
+# minio files
+minio_data/
 
-spark/**
-# Ignore Spark distribution directory
-# This directory contains the Spark distribution files, which are used to run Spark applications.
-# It is important to keep this directory in the .gitignore file to avoid committing large binary files to the repository.
+# python
+*.pyc
+__pycache__
+
+# spark files
+spark-defaults.conf
