@@ -6,9 +6,6 @@ NETWORK_NAME=datalake-network
 include $(ENV_FILE)
 export $(shell sed 's/=.*//' $(ENV_FILE))
 
-.PHONY: run
-run: up deploy-flows
-
 
 .PHONY: create-network
 create-network:
@@ -27,11 +24,6 @@ build: create-network
 .PHONY: up
 up: build
 	docker compose up --build -d
-
-
-.PHONY: deploy-flows
-deploy-flows:
-	docker exec prefect-server python deploy.py
 
 
 .PHONY: down
