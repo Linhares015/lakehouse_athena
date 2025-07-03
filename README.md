@@ -7,6 +7,7 @@ Este repositório fornece um exemplo de stack "lakehouse" local usando **Apache 
 - `docker-compose.yml` – orquestração dos serviços
 - `config/` – modelos de configuração do Spark
 - `images/` – Dockerfiles utilizados nas imagens
+- `dags/` – DAGs de exemplo para o Airflow
 - `jobs/` – notebooks e scripts de exemplo
 - `makefile` – comandos de apoio para operação da stack
 
@@ -17,7 +18,7 @@ Este repositório fornece um exemplo de stack "lakehouse" local usando **Apache 
 
 ## Configuração Inicial
 
-1. **Crie um arquivo `.env`** na raiz do projeto com ao menos as variáveis abaixo:
+1. **Copie o arquivo `.env.example` para `.env`** e ajuste os valores abaixo se necessário:
 
    ```env
    MINIO_ROOT_USER=minio
@@ -57,6 +58,10 @@ Utilize as credenciais do arquivo `.env` para fazer login.
 - **Configuração do Spark**: edite `config/spark-defaults.conf.template` e execute `make build` ou `make up` para reconstruir.
 - **Imagens Docker**: os Dockerfiles em `images/` podem ser adaptados para instalar dependências adicionais.
 - **Jobs/Notebooks**: adicione seus notebooks ou scripts Spark em `jobs/`.
+
+## Testes
+
+Execute `pytest` para validar os DAGs e garantir que não há erros de importação.
 
 ## Licença
 
