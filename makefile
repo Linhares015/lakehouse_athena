@@ -1,7 +1,7 @@
 ENV_FILE = .env
 SPARK_DEFAULTS_TEMPLATE_PATH = config/spark-defaults.conf.template
 SPARK_DEFAULTS_PATH = config/spark-defaults.conf
-NETWORK_NAME=datalake-network
+NETWORK_NAME=lakehouse-athena_524485_airflow
 
 include $(ENV_FILE)
 export $(shell sed 's/=.*//' $(ENV_FILE))
@@ -23,10 +23,14 @@ build: create-network
 
 .PHONY: up
 up: build
+	@echo "🚀 Iniciando os containers..."
+	astro dev start
 	docker compose up --build -d
 
 
 .PHONY: down
 down:
+	@echo "🛑 Parando os containers..."
+	astro dev stop
 	docker compose down
 	docker network rm $(NETWORK_NAME)
