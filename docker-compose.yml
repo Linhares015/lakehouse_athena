@@ -35,6 +35,22 @@ services:
     networks:
       - lakehouse-athena_524485_airflow
 
+  trino:
+    image: trinodb/trino:441
+    container_name: trino
+    ports:
+      - "8090:8080"
+    environment:
+      - TZ=America/Sao_Paulo
+    depends_on:
+      - minio
+    volumes:
+      - ./trino/etc:/etc/trino
+      - ./trino/data:/var/trino/data
+    networks:
+      - lakehouse-athena_524485_airflow
+
+
 networks:
   lakehouse-athena_524485_airflow:
     name: lakehouse-athena_524485_airflow

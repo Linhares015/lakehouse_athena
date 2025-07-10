@@ -4,6 +4,7 @@
 
 # minio files
 minio_data/
+trino/data/
 
 # python
 *.pyc
