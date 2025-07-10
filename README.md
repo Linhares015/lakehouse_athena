@@ -2,6 +2,12 @@
 
 Este repositório fornece um exemplo de stack "lakehouse" local usando **Apache Spark** e **MinIO** para armazenamento de objetos. É destinado a experimentos com Spark, tabelas Delta e armazenamento compatível com S3.
 
+## Arquitetura
+
+O diagrama a seguir ilustra como os contêineres se conectam para formar a stack.
+
+![Arquitetura do projeto](image.png)
+
 ## Visão Geral do Repositório
 
 - `docker-compose.yml` – orquestração dos serviços
