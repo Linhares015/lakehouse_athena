@@ -15,12 +15,14 @@ O diagrama a seguir ilustra como os contêineres se conectam para formar a stack
 - `images/` – Dockerfiles utilizados nas imagens
 - `dags/` – DAGs de exemplo para o Airflow
 - `jobs/` – notebooks e scripts de exemplo
+- `trino/` – arquivos de configuração do Trino
 - `makefile` – comandos de apoio para operação da stack
 
 ## Requisitos
 
 - [Docker](https://docs.docker.com/get-docker/) com Docker Compose
 - [make](https://www.gnu.org/software/make/) para executar o *makefile*
+- [Astro CLI](https://docs.astronomer.io/astro/cli/install-cli/) para gerenciar o Airflow local
 
 ## Configuração Inicial
 
@@ -40,7 +42,7 @@ O diagrama a seguir ilustra como os contêineres se conectam para formar a stack
    ```bash
    make up
    ```
-   O alvo `make up` verifica/cria a rede `datalake-network`, gera a configuração do Spark e sobe os serviços definidos no `docker-compose.yml`.
+   O alvo `make up` verifica/cria a rede `lakehouse-athena_524485_airflow`, gera a configuração do Spark e sobe os serviços definidos no `docker-compose.yml`.
 
 3. **Pare a stack**:
 
@@ -51,6 +53,8 @@ O diagrama a seguir ilustra como os contêineres se conectam para formar a stack
 ## Utilização
 
 Acesse o Jupyter Notebook em [http://localhost:8888](http://localhost:8888). A autenticação vem desabilitada por padrão. Há um notebook de exemplo em `jobs/teste.ipynb` demonstrando a escrita de uma pequena tabela Delta no MinIO.
+A interface do Airflow fica em [http://localhost:8080](http://localhost:8080) (credenciais padrao "admin"/"admin").
+O Trino pode ser acessado em [http://localhost:8090](http://localhost:8090).
 
 MinIO fica disponível em:
 
@@ -68,6 +72,7 @@ Utilize as credenciais do arquivo `.env` para fazer login.
 ## Testes
 
 Execute `pytest` para validar os DAGs e garantir que não há erros de importação.
+Certifique-se de que as dependências de `requirements.txt` estejam instaladas antes de rodar os testes.
 
 ## Licença
 
