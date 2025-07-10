@@ -18,6 +18,13 @@ O diagrama a seguir ilustra como os contêineres se conectam para formar a stack
 - `trino/` – arquivos de configuração do Trino
 - `makefile` – comandos de apoio para operação da stack
 
+## Programas da Stack
+
+- **MinIO** – armazenamento de objetos compatível com S3 utilizado para guardar dados e tabelas Delta (portas 9000 e 9001).
+- **Spark/Jupyter** – contêiner com Apache Spark e Jupyter para processamento interativo (porta 8888).
+- **Trino** – motor SQL capaz de consultar dados no MinIO e outros catálogos (porta 8090).
+- **Airflow** – orquestrador de workflows iniciado via `astro dev start` e disponível em `http://localhost:8080`.
+
 ## Requisitos
 
 - [Docker](https://docs.docker.com/get-docker/) com Docker Compose
@@ -62,6 +69,18 @@ MinIO fica disponível em:
 - **Console**: `http://localhost:9001`
 
 Utilize as credenciais do arquivo `.env` para fazer login.
+
+## Configuração do Trino
+
+O diretório `trino/` contém os arquivos que controlam o comportamento do serviço:
+
+- `etc/config.properties` – configurações básicas do servidor, como porta e identificação do coordenador.
+- `etc/node.properties` – informações do nó e caminho onde os dados serão armazenados.
+- `etc/jvm.config` – opções de memória e parâmetros da JVM utilizados na inicialização.
+- `etc/catalog/hive.properties` – catálogo Hive local usado para testes rápidos.
+- `etc/catalog/minio.yaml` – catálogo Delta Lake apontando para o MinIO e usando as credenciais definidas em `.env`.
+
+A pasta `data/` é montada em `/var/trino/data` e armazena logs e outros artefatos gerados pelo Trino.
 
 ## Customização
 
