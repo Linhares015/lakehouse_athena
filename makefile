@@ -33,5 +33,4 @@ down:
 	@echo "🛑 Parando os containers..."
 	astro dev stop
 	docker compose down
-	docker network rm $(NETWORK_NAME)
-	docker system prune -a
+	docker network prune -f
