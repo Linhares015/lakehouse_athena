@@ -22,7 +22,7 @@ build: create-network
 	envsubst < $(SPARK_DEFAULTS_TEMPLATE_PATH) > $(SPARK_DEFAULTS_PATH)
 
 .PHONY: up
-up: build
+up: #build
 	@echo "🚀 Iniciando os containers..."
 	astro dev start
 	docker compose up --build -d
@@ -34,3 +34,4 @@ down:
 	astro dev stop
 	docker compose down
 	docker network rm $(NETWORK_NAME)
+	docker system prune -a
