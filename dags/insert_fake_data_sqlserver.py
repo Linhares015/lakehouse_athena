@@ -23,21 +23,22 @@ def inserir_dados_fakes_sqlserver():
         print("✅ Cursor aberto")
         fake = Faker('pt_BR')
 
-        # 1) CRIAR TABELAS SE NÃO EXISTIREM
+        # 1) CRIAR TABELAS SE NÃO EXISTIREM (já com updated_at)
         print("🕑 Verificando/criando tabelas")
-        for name, ddl in [
-            ('lojas', """
+        tabelas = [
+            ('lojas', f"""
                 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'lojas')
                 BEGIN
                   CREATE TABLE dbo.lojas (
                     id_loja INT IDENTITY(1,1) PRIMARY KEY,
                     nome_loja VARCHAR(80),
                     cidade VARCHAR(60),
-                    estado CHAR(2)
+                    estado CHAR(2),
+                    updated_at DATETIME2(3) NOT NULL CONSTRAINT DF_lojas_updated_at DEFAULT SYSUTCDATETIME()
                   )
                 END
             """),
-            ('clientes', """
+            ('clientes', f"""
                 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'clientes')
                 BEGIN
                   CREATE TABLE dbo.clientes (
@@ -45,11 +46,12 @@ def inserir_dados_fakes_sqlserver():
                     nome VARCHAR(100),
                     email VARCHAR(100),
                     telefone VARCHAR(30),
-                    data_cadastro DATE
+                    data_cadastro DATE,
+                    updated_at DATETIME2(3) NOT NULL CONSTRAINT DF_clientes_updated_at DEFAULT SYSUTCDATETIME()
                   )
                 END
             """),
-            ('pedidos', """
+            ('pedidos', f"""
                 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'pedidos')
                 BEGIN
                   CREATE TABLE dbo.pedidos (
@@ -59,17 +61,71 @@ def inserir_dados_fakes_sqlserver():
                     data_pedido DATE,
                     valor_total DECIMAL(10,2),
                     status VARCHAR(20),
+                    updated_at DATETIME2(3) NOT NULL CONSTRAINT DF_pedidos_updated_at DEFAULT SYSUTCDATETIME(),
                     FOREIGN KEY (id_cliente) REFERENCES dbo.clientes(id_cliente),
                     FOREIGN KEY (id_loja) REFERENCES dbo.lojas(id_loja)
                   )
                 END
-            """)
-        ]:
+            """),
+        ]
+
+        for name, ddl in tabelas:
             print(f"   🕑 Tabela `{name}`")
             cursor.execute(ddl)
             print(f"   ✅ Tabela `{name}` OK")
         conn.commit()
         print("✅ Commit após criação de tabelas")
+
+        # 1.1) SE JÁ EXISTIREM sem updated_at, adiciona a coluna
+        print("🕑 Garantindo coluna updated_at nas tabelas existentes")
+        for name, pk in [('lojas', 'id_loja'), ('clientes', 'id_cliente'), ('pedidos', 'id_pedido')]:
+            print(f"   🕑 Checando coluna updated_at em `{name}`")
+            cursor.execute(f"""
+                IF NOT EXISTS (
+                  SELECT 1
+                  FROM sys.columns
+                  WHERE object_id = OBJECT_ID('dbo.{name}')
+                    AND name = 'updated_at'
+                )
+                BEGIN
+                  ALTER TABLE dbo.{name}
+                  ADD updated_at DATETIME2(3) NOT NULL CONSTRAINT DF_{name}_updated_at DEFAULT SYSUTCDATETIME();
+                END
+            """)
+            print(f"   ✅ Coluna updated_at OK em `{name}`")
+        conn.commit()
+        print("✅ Commit após garantir coluna updated_at")
+
+        # 1.2) CRIAR TRIGGERS (se não existirem) para atualizar updated_at em UPDATE
+        print("🕑 Garantindo triggers de atualização de updated_at")
+        triggers = [
+            ('lojas', 'id_loja'),
+            ('clientes', 'id_cliente'),
+            ('pedidos', 'id_pedido'),
+        ]
+        for name, pk in triggers:
+            trg = f"trg_{name}_set_updated_at"
+            print(f"   🕑 Trigger `{trg}`")
+            cursor.execute(f"""
+                IF NOT EXISTS (
+                  SELECT 1 FROM sys.triggers WHERE name = '{trg}'
+                )
+                BEGIN
+                  EXEC('CREATE TRIGGER dbo.{trg} ON dbo.{name}
+                    AFTER UPDATE
+                    AS
+                    BEGIN
+                      SET NOCOUNT ON;
+                      UPDATE t
+                        SET updated_at = SYSUTCDATETIME()
+                      FROM dbo.{name} t
+                      INNER JOIN inserted i ON t.{pk} = i.{pk};
+                    END');
+                END
+            """)
+            print(f"   ✅ Trigger `{trg}` OK")
+        conn.commit()
+        print("✅ Commit após criação/verificação de triggers")
 
         # 2) INSERIR LOJAS
         N_LOJAS = 2
