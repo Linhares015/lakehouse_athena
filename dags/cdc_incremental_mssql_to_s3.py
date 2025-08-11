@@ -11,8 +11,8 @@ import csv, json, tempfile
 # -----------------------------
 MSSQL_CONN_ID = "mssql_local"
 AWS_CONN_ID   = "aws_default"
-S3_BUCKET     = "meu-bucket-dados"          # ajuste
-S3_PREFIX     = "raw/sqlserver"              # ajuste
+S3_BUCKET     = "developraw"
+S3_PREFIX     = "raw/sqlserver"
 FETCH_SIZE    = 50_000
 
 TABLES = [
